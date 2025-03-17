@@ -3,12 +3,12 @@ package accrualservice
 import (
 	"encoding/json"
 	"fmt"
+	"gophermart/cmd/internal/config"
+	"gophermart/cmd/internal/constants"
+	"gophermart/cmd/internal/models"
 	"net/http"
 	"strconv"
 
-	"github.com/maryakotova/gophermart/cmd/internal/config"
-	"github.com/maryakotova/gophermart/cmd/internal/constants"
-	"github.com/maryakotova/gophermart/cmd/internal/models"
 	"go.uber.org/zap"
 )
 

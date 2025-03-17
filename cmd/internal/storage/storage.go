@@ -2,10 +2,10 @@ package storage
 
 import (
 	"context"
+	"gophermart/cmd/internal/config"
+	"gophermart/cmd/internal/models"
+	"gophermart/cmd/internal/storage/postgres"
 
-	"github.com/maryakotova/gophermart/cmd/internal/config"
-	"github.com/maryakotova/gophermart/cmd/internal/models"
-	"github.com/maryakotova/gophermart/cmd/internal/storage/postgres"
 	"go.uber.org/zap"
 )
 

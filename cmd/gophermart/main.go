@@ -1,15 +1,15 @@
 package main
 
 import (
+	"gophermart/cmd/internal/accrualservice"
+	"gophermart/cmd/internal/config"
+	"gophermart/cmd/internal/handlers"
+	"gophermart/cmd/internal/logger"
+	"gophermart/cmd/internal/service"
+	"gophermart/cmd/internal/storage"
 	"net/http"
 
 	"github.com/go-chi/chi"
-	"github.com/maryakotova/gophermart/cmd/internal/accrualservice"
-	"github.com/maryakotova/gophermart/cmd/internal/config"
-	"github.com/maryakotova/gophermart/cmd/internal/handlers"
-	"github.com/maryakotova/gophermart/cmd/internal/logger"
-	"github.com/maryakotova/gophermart/cmd/internal/service"
-	"github.com/maryakotova/gophermart/cmd/internal/storage"
 )
 
 func main() {

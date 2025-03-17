@@ -3,14 +3,14 @@ package service
 import (
 	"context"
 	"fmt"
+	"gophermart/cmd/internal/accrualservice"
+	"gophermart/cmd/internal/constants"
+	"gophermart/cmd/internal/customerrors"
+	"gophermart/cmd/internal/models"
+	"gophermart/cmd/internal/storage"
+	"gophermart/cmd/internal/utils"
 	"time"
 
-	"github.com/maryakotova/gophermart/cmd/internal/accrualservice"
-	"github.com/maryakotova/gophermart/cmd/internal/constants"
-	"github.com/maryakotova/gophermart/cmd/internal/customerrors"
-	"github.com/maryakotova/gophermart/cmd/internal/models"
-	"github.com/maryakotova/gophermart/cmd/internal/storage"
-	"github.com/maryakotova/gophermart/cmd/internal/utils"
 	"go.uber.org/zap"
 )
 

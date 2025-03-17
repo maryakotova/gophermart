@@ -4,15 +4,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"gophermart/cmd/internal/authutils"
+	"gophermart/cmd/internal/config"
+	"gophermart/cmd/internal/customerrors"
+	"gophermart/cmd/internal/models"
+	"gophermart/cmd/internal/service"
+	"gophermart/cmd/internal/utils"
 	"io"
 	"net/http"
 
-	"github.com/maryakotova/gophermart/cmd/internal/authutils"
-	"github.com/maryakotova/gophermart/cmd/internal/config"
-	"github.com/maryakotova/gophermart/cmd/internal/customerrors"
-	"github.com/maryakotova/gophermart/cmd/internal/models"
-	"github.com/maryakotova/gophermart/cmd/internal/service"
-	"github.com/maryakotova/gophermart/cmd/internal/utils"
 	"go.uber.org/zap"
 )
 

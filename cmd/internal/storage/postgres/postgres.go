@@ -4,14 +4,15 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"gophermart/cmd/internal/config"
+	"gophermart/cmd/internal/models"
 	"sync"
 	"time"
 
 	_ "github.com/jackc/pgconn"
 	_ "github.com/jackc/pgerrcode"
 	_ "github.com/jackc/pgx/v4/stdlib"
-	"github.com/maryakotova/gophermart/cmd/internal/config"
-	"github.com/maryakotova/gophermart/cmd/internal/models"
+
 	"go.uber.org/zap"
 )
 
