@@ -3,11 +3,20 @@ package storage
 import (
 	"context"
 
-	"github.com/maryakotova/gophermart/internal/config"
-	"github.com/maryakotova/gophermart/internal/models"
-	"github.com/maryakotova/gophermart/internal/storage/postgres"
+	"github.com/maryakotova/gophermart/cmd/internal/config"
+	"github.com/maryakotova/gophermart/cmd/internal/models"
+	"github.com/maryakotova/gophermart/cmd/internal/storage/postgres"
 	"go.uber.org/zap"
 )
+
+// import (
+// 	"context"
+
+// 	"github.com/maryakotova/gophermart/cmd/internal/config"
+// 	"github.com/maryakotova/gophermart/cmd/internal/models"
+// 	"github.com/maryakotova/gophermart/cmd/internal/storage/postgres"
+// 	"go.uber.org/zap"
+// )
 
 type Storage interface {
 	GetUserID(ctx context.Context, userName string) (userID int, err error)

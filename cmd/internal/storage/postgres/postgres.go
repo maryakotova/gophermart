@@ -10,8 +10,8 @@ import (
 	_ "github.com/jackc/pgconn"
 	_ "github.com/jackc/pgerrcode"
 	_ "github.com/jackc/pgx/v4/stdlib"
-	"github.com/maryakotova/gophermart/internal/config"
-	"github.com/maryakotova/gophermart/internal/models"
+	"github.com/maryakotova/gophermart/cmd/internal/config"
+	"github.com/maryakotova/gophermart/cmd/internal/models"
 	"go.uber.org/zap"
 )
 
