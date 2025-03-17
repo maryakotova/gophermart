@@ -13,24 +13,22 @@ jobs:
     container: golang:1.23
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Checkout statictest code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
+
+      - name: Download statictest binary
+        uses: robinraju/release-downloader@v1.8
         with:
           repository: Yandex-Practicum/go-autotests
-          sparse-checkout: |
-            cmd/statictest
-            go.mod
-            go.sum
-          sparse-checkout-cone-mode: false
-          path: statictest
-      
-      - name: Prepare statictest binary
-        run: | 
-          (cd statictest && go build -buildvcs=false -o statictest ./cmd/statictest/.)
-          (mv statictest/statictest /usr/local/bin/statictest)
-      
+          latest: true
+          fileName: statictest
+          out-file-path: .tools
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup autotest binary
+        run: |
+          chmod -R +x $GITHUB_WORKSPACE/.tools/statictest
+          mv $GITHUB_WORKSPACE/.tools/statictest /usr/local/bin/statictest
+
       - name: Run statictest
         run: |
-          go vet -vettool=$(which statictest) ./... 
+          go vet -vettool=$(which statictest) ./...
