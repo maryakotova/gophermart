@@ -34,6 +34,7 @@ func (a *AccrualService) GetAccrualFromService(orderNum int64) (response models.
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
+		a.logger.Error(err.Error())
 		return response, err
 	}
 
@@ -41,6 +42,7 @@ func (a *AccrualService) GetAccrualFromService(orderNum int64) (response models.
 
 	resp, err := client.Do(req)
 	if err != nil {
+		a.logger.Error(err.Error())
 		return response, err
 	}
 
@@ -50,6 +52,7 @@ func (a *AccrualService) GetAccrualFromService(orderNum int64) (response models.
 		err = decoder.Decode(&response)
 		if err != nil {
 			err = fmt.Errorf("ошибка при десериализации JSON: %w", err)
+			a.logger.Error(err.Error())
 			return response, err
 		}
 
@@ -61,10 +64,12 @@ func (a *AccrualService) GetAccrualFromService(orderNum int64) (response models.
 
 	case http.StatusInternalServerError:
 		err = fmt.Errorf("ошибка при обращении к системе расчёта начислений баллов лояльности")
+		a.logger.Error(err.Error())
 		return
 
 	default:
 		err = fmt.Errorf("невозможно обработать ответ от системы расчёта начислений баллов лояльности (неизвестный статус)")
+		a.logger.Error(err.Error())
 		return
 	}
 

@@ -38,12 +38,14 @@ func (handler *Handler) Register(res http.ResponseWriter, req *http.Request) {
 	err := decoder.Decode(&request)
 	if err != nil || request.Login == "" || request.Password == "" {
 		err = fmt.Errorf("ошибка при десериализации JSON: %w", err)
+		handler.logger.Error(err.Error())
 		http.Error(res, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	if request.Login == "" || request.Password == "" {
 		err = fmt.Errorf("логин и пароль должны быть заполнены")
+		handler.logger.Error(err.Error())
 		http.Error(res, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -60,12 +62,14 @@ func (handler *Handler) Register(res http.ResponseWriter, req *http.Request) {
 
 	if userID == -1 {
 		err = fmt.Errorf("неизвестная ошибка при создании пользователя")
+		handler.logger.Error(err.Error())
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = authutils.SetAuthCookie(res, userID)
 	if err != nil {
+		handler.logger.Error(err.Error())
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -83,12 +87,14 @@ func (handler *Handler) Login(res http.ResponseWriter, req *http.Request) {
 	err := decoder.Decode(&request)
 	if err != nil || request.Login == "" || request.Password == "" {
 		err = fmt.Errorf("ошибка при десериализации JSON: %w", err)
+		handler.logger.Error(err.Error())
 		http.Error(res, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	if request.Login == "" || request.Password == "" {
 		err = fmt.Errorf("логин и пароль должны быть заполнены")
+		handler.logger.Error(err.Error())
 		http.Error(res, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -101,12 +107,14 @@ func (handler *Handler) Login(res http.ResponseWriter, req *http.Request) {
 
 	if userID == -1 {
 		err = fmt.Errorf("неизвестная ошибка при регистрации пользователя")
+		handler.logger.Error(err.Error())
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = authutils.SetAuthCookie(res, userID)
 	if err != nil {
+		handler.logger.Error(err.Error())
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -119,12 +127,14 @@ func (handler *Handler) Login(res http.ResponseWriter, req *http.Request) {
 func (handler *Handler) LoadOrder(res http.ResponseWriter, req *http.Request) {
 	userID, err := authutils.ReadAuthCookie(req)
 	if err != nil {
+		handler.logger.Error(err.Error())
 		http.Error(res, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	orderNum, err := io.ReadAll(req.Body)
 	if err != nil {
+		handler.logger.Error(err.Error())
 		http.Error(res, "ошибка при чтении тела запроса", http.StatusBadRequest)
 		return
 	}
@@ -132,6 +142,7 @@ func (handler *Handler) LoadOrder(res http.ResponseWriter, req *http.Request) {
 
 	orderNumber, err := utils.CheckOrderNumber(string(orderNum))
 	if err != nil {
+		handler.logger.Error(err.Error())
 		http.Error(res, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
@@ -157,6 +168,7 @@ func (handler *Handler) GetOrderList(res http.ResponseWriter, req *http.Request)
 
 	userID, err := authutils.ReadAuthCookie(req)
 	if err != nil {
+		handler.logger.Error(err.Error())
 		http.Error(res, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -175,6 +187,7 @@ func (handler *Handler) GetOrderList(res http.ResponseWriter, req *http.Request)
 	enc := json.NewEncoder(res)
 	if err := enc.Encode(orders); err != nil {
 		err = fmt.Errorf("ошибка при заполнении ответа: %w", err)
+		handler.logger.Error(err.Error())
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -188,6 +201,7 @@ func (handler *Handler) GetBalance(res http.ResponseWriter, req *http.Request) {
 
 	userID, err := authutils.ReadAuthCookie(req)
 	if err != nil {
+		handler.logger.Error(err.Error())
 		http.Error(res, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -201,6 +215,7 @@ func (handler *Handler) GetBalance(res http.ResponseWriter, req *http.Request) {
 	enc := json.NewEncoder(res)
 	if err := enc.Encode(balance); err != nil {
 		err = fmt.Errorf("ошибка при заполнении ответа: %w", err)
+		handler.logger.Error(err.Error())
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -213,6 +228,7 @@ func (handler *Handler) GetBalance(res http.ResponseWriter, req *http.Request) {
 func (handler *Handler) Withdraw(res http.ResponseWriter, req *http.Request) {
 	userID, err := authutils.ReadAuthCookie(req)
 	if err != nil {
+		handler.logger.Error(err.Error())
 		http.Error(res, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -220,12 +236,14 @@ func (handler *Handler) Withdraw(res http.ResponseWriter, req *http.Request) {
 	var request models.WithdrawRequest
 	dec := json.NewDecoder(req.Body)
 	if err := dec.Decode(&request); err != nil {
+		handler.logger.Error(err.Error())
 		http.Error(res, err.Error(), http.StatusInternalServerError) //должен быть http.StatusBadRequest
 		return
 	}
 
 	orderNumber, err := utils.CheckOrderNumber(request.OrderNumber)
 	if err != nil {
+		handler.logger.Error(err.Error())
 		http.Error(res, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
@@ -248,6 +266,7 @@ func (handler *Handler) GetWithdraws(res http.ResponseWriter, req *http.Request)
 
 	userID, err := authutils.ReadAuthCookie(req)
 	if err != nil {
+		handler.logger.Error(err.Error())
 		http.Error(res, err.Error(), http.StatusUnauthorized)
 		return
 	}
@@ -266,6 +285,7 @@ func (handler *Handler) GetWithdraws(res http.ResponseWriter, req *http.Request)
 	enc := json.NewEncoder(res)
 	if err := enc.Encode(withdraws); err != nil {
 		err = fmt.Errorf("ошибка при заполнении ответа: %w", err)
+		handler.logger.Error(err.Error())
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -37,21 +37,25 @@ func NewService(storage *storage.Storage, logger *zap.Logger, accrual *accrualse
 func (s *Service) CreateUser(ctx context.Context, login string, password string) (userID int, err error) {
 	exists, err := s.checkUserExists(ctx, login)
 	if err != nil {
+		s.logger.Error(err.Error())
 		return
 	}
 
 	if exists {
 		err = customerrors.ErrUsernameTaken
+		s.logger.Error(err.Error())
 		return
 	}
 
 	hashedPassword, err := utils.HashPassword(password)
 	if err != nil {
+		s.logger.Error(err.Error())
 		return
 	}
 
 	userID, err = s.createUser(ctx, login, hashedPassword)
 	if err != nil {
+		s.logger.Error(err.Error())
 		return
 	}
 
@@ -62,16 +66,19 @@ func (s *Service) CheckLoginData(ctx context.Context, login string, password str
 
 	hashedPassword, err := utils.HashPassword(password)
 	if err != nil {
+		s.logger.Error(err.Error())
 		return
 	}
 
 	userID, dbPassword, err := s.storage.GetUserAuthData(ctx, login)
 	if err != nil {
+		s.logger.Error(err.Error())
 		return
 	}
 
 	if dbPassword != hashedPassword || userID == 0 {
 		err = fmt.Errorf("неверная пара логин/пароль")
+		s.logger.Error(err.Error())
 		return
 	}
 
@@ -82,22 +89,26 @@ func (s *Service) LoadOrderNumber(ctx context.Context, orderNumber int64, userID
 
 	err := s.checkOrderLoaded(ctx, orderNumber, userID)
 	if err != nil {
+		s.logger.Error(err.Error())
 		return err
 	}
 
 	accrualResponce, err := s.accrual.GetAccrualFromService(orderNumber)
 	if err != nil {
+		s.logger.Error(err.Error())
 		return err
 	}
 
 	err = s.storage.InsertOrder(ctx, userID, accrualResponce)
 	if err != nil {
+		s.logger.Error(err.Error())
 		return err
 	}
 
 	if accrualResponce.Status == constants.Processed && accrualResponce.Accrual > 0 {
 		err = s.storage.IncreaseBalance(ctx, userID, accrualResponce.Accrual)
 		if err != nil {
+			s.logger.Error(err.Error())
 			return err
 		}
 	}
@@ -109,6 +120,7 @@ func (s *Service) GetOrders(ctx context.Context, userID int) (orders []models.Or
 
 	bdOrders, err := s.storage.GetOrdersForUser(ctx, userID)
 	if err != nil {
+		s.logger.Error(err.Error())
 		return orders, err
 	}
 
@@ -129,11 +141,13 @@ func (s *Service) GetBalance(ctx context.Context, userID int) (balance models.Ba
 
 	currentBalance, err := s.storage.GetCurrentBalance(ctx, userID)
 	if err != nil {
+		s.logger.Error(err.Error())
 		return
 	}
 
 	WithdrawalSum, err := s.storage.GetWithdrawalSum(ctx, userID)
 	if err != nil {
+		s.logger.Error(err.Error())
 		return
 	}
 
@@ -147,11 +161,13 @@ func (s *Service) WithdrawalRequest(ctx context.Context, userID int, orderNumber
 
 	currentBalance, err := s.storage.GetCurrentBalance(ctx, userID)
 	if err != nil {
+		s.logger.Error(err.Error())
 		return
 	}
 
 	if currentBalance < sum {
 		err = customerrors.ErrLowBalance
+		s.logger.Error(err.Error())
 		return
 	}
 
@@ -159,11 +175,13 @@ func (s *Service) WithdrawalRequest(ctx context.Context, userID int, orderNumber
 
 	err = s.storage.UpdateBalance(ctx, userID, newBalance)
 	if err != nil {
+		s.logger.Error(err.Error())
 		return err
 	}
 
 	err = s.storage.InsertWithdrawal(ctx, userID, orderNumber, sum)
 	if err != nil {
+		s.logger.Error(err.Error())
 		return err
 	}
 
@@ -174,6 +192,7 @@ func (s *Service) GetWithdraws(ctx context.Context, userID int) (withdrawals []m
 
 	bdWithdrawals, err := s.storage.GetWithdrawalsForUser(ctx, userID)
 	if err != nil {
+		s.logger.Error(err.Error())
 		return withdrawals, err
 	}
 
