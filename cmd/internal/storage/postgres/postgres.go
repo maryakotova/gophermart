@@ -252,6 +252,10 @@ func (ps *PostgresStorage) GetOrdersForUser(ctx context.Context, userID int) (or
 	if err != nil {
 		return nil, err
 	}
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
 
 	for rows.Next() {
 		var order models.OrderList
@@ -364,6 +368,10 @@ func (ps *PostgresStorage) GetWithdrawalsForUser(ctx context.Context, userID int
 	rows, err := ps.db.QueryContext(ctx, query, userID)
 	ps.mtx.Unlock()
 	defer rows.Close()
+	if err != nil {
+		return nil, err
+	}
+	err = rows.Err()
 	if err != nil {
 		return nil, err
 	}

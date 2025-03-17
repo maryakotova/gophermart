@@ -45,6 +45,7 @@ func (a *AccrualService) GetAccrualFromService(orderNum int64) (response models.
 		a.logger.Error(err.Error())
 		return response, err
 	}
+	defer resp.Body.Close()
 
 	switch resp.StatusCode {
 	case http.StatusOK:
@@ -73,9 +74,9 @@ func (a *AccrualService) GetAccrualFromService(orderNum int64) (response models.
 		return
 	}
 
-	if response.Status != constants.Invalid && response.Status != constants.Processed && response.Status != constants.NotRelevant {
-		//добавить в поток на обработку воркерами
-	}
+	// if response.Status != constants.Invalid && response.Status != constants.Processed && response.Status != constants.NotRelevant {
+	// 	//добавить в поток на обработку воркерами
+	// }
 
 	return response, err
 }
