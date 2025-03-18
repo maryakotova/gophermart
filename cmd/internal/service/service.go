@@ -60,22 +60,16 @@ func (s *Service) CreateUser(ctx context.Context, login string, password string)
 
 func (s *Service) CheckLoginData(ctx context.Context, login string, password string) (userID int, err error) {
 
-	hashedPassword, err := utils.HashPassword(password)
-	if err != nil {
-		s.logger.Error(err.Error())
-		return
-	}
-
 	userID, dbPassword, err := s.storage.GetUserAuthData(ctx, login)
 	if err != nil {
 		s.logger.Error(err.Error())
-		return
+		return -1, err
 	}
 
-	if dbPassword != hashedPassword || userID == 0 {
-		err = fmt.Errorf("неверная пара логин/пароль")
+	err = utils.СheckPassword(dbPassword, password)
+	if err != nil {
 		s.logger.Error(err.Error())
-		return
+		return -1, err
 	}
 
 	return
@@ -219,12 +213,12 @@ func (s *Service) createUser(ctx context.Context, login string, hashedPassword s
 }
 
 func (s *Service) checkOrderLoaded(ctx context.Context, orderNumber int64, userID int) (err error) {
-	dbUserID, err := s.storage.GetUserByOrderNum(ctx, orderNumber)
-	if err != nil {
-		return err
-	}
+	dbUserID, _ := s.storage.GetUserByOrderNum(ctx, orderNumber)
+	// if err != nil {
+	// 	return err
+	// }
 
-	if dbUserID != 0 {
+	if dbUserID != -1 {
 		if dbUserID == userID {
 			err = customerrors.ErrOrderLoadedByUser
 		} else {
