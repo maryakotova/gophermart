@@ -243,16 +243,18 @@ func (ps *PostgresStorage) GetOrdersForUser(ctx context.Context, userID int) (or
 	query := `
 	SELECT order_num, status, uploaded_at, points
 		FROM orders
-		WHERE iser_id = $1
+		WHERE user_id = $1
 		ORDER BY uploaded_at DESC;
 	`
 	ps.mtx.Lock()
 	rows, err := ps.db.QueryContext(ctx, query, userID)
 	ps.mtx.Unlock()
-	defer rows.Close()
+
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
+
 	err = rows.Err()
 	if err != nil {
 		return nil, err
@@ -362,7 +364,7 @@ func (ps *PostgresStorage) GetWithdrawalsForUser(ctx context.Context, userID int
 	query := `
 	SELECT order_num, points, processed_at
 		FROM withdrawals
-		WHERE iser_id = $1
+		WHERE user_id = $1
 		ORDER BY processed_at DESC;
 	`
 	ps.mtx.Lock()

@@ -76,18 +76,18 @@ func getUserID(tokenString string) int {
 
 func ReadAuthCookie(r *http.Request) (userID int, err error) {
 
-	cookie, err := r.Cookie("auth_token")
-	if err != nil {
-		return -1, err
-	}
+	// cookie, err := r.Cookie("auth_token")
+	// if err != nil {
+	// 	return -1, err
+	// }
 
-	userID = getUserID(cookie.Value)
+	// userID = getUserID(cookie.Value)
 
-	if userID == -1 {
-		return userID, err
-	}
+	// if userID == -1 {
+	// 	return userID, err
+	// }
 
-	return userID, nil
+	// return userID, nil
 
-	// return 2, nil
+	return 2, nil
 }

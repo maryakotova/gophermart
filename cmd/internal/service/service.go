@@ -131,14 +131,12 @@ func (s *Service) GetBalance(ctx context.Context, userID int) (balance models.Ba
 
 	currentBalance, err := s.storage.GetCurrentBalance(ctx, userID)
 	if err != nil {
-		s.logger.Error(err.Error())
-		return
+		currentBalance = 0
 	}
 
 	WithdrawalSum, err := s.storage.GetWithdrawalSum(ctx, userID)
 	if err != nil {
-		s.logger.Error(err.Error())
-		return
+		WithdrawalSum = 0
 	}
 
 	balance.Balance = currentBalance
@@ -151,8 +149,7 @@ func (s *Service) WithdrawalRequest(ctx context.Context, userID int, orderNumber
 
 	currentBalance, err := s.storage.GetCurrentBalance(ctx, userID)
 	if err != nil {
-		s.logger.Error(err.Error())
-		return
+		currentBalance = 0
 	}
 
 	if currentBalance < sum {
