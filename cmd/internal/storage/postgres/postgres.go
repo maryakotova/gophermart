@@ -344,7 +344,7 @@ func (ps *PostgresStorage) IncreaseBalance(ctx context.Context, userID int, poin
 func (ps *PostgresStorage) InsertWithdrawal(ctx context.Context, userID int, orderNumber int64, points float64) error {
 
 	query := `
-	INSERT INTO orders (order_num, user_id, uploaded_at, points)
+	INSERT INTO withdrawals (order_num, user_id, processed_at, points)
 		VALUES ($1, $2, $3, $4);
 	`
 
