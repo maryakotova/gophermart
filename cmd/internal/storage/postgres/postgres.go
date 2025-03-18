@@ -278,7 +278,7 @@ func (ps *PostgresStorage) UpdateBalance(ctx context.Context, userID int, points
 	query := `
 	UPDATE balance
 		SET sum = $1
-		WHERE user_id = S2;
+		WHERE user_id = $2;
 	`
 	ps.mtx.Lock()
 	_, err := ps.db.ExecContext(ctx, query, points, userID)
