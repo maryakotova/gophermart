@@ -293,7 +293,7 @@ func (ps *PostgresStorage) GetCurrentBalance(ctx context.Context, userID int) (b
 	query := `
 	SELECT sum 
 		FROM balance 
-		WHERE user_name = $1;
+		WHERE user_id = $1;
 	`
 	ps.mtx.Lock()
 	err = ps.db.QueryRowContext(ctx, query, userID).Scan(&balance)
