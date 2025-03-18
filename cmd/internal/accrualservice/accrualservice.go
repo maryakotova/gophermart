@@ -30,7 +30,7 @@ func NewAccrualSystem(cfg *config.Config, logger *zap.Logger) (*AccrualService, 
 
 func (a *AccrualService) GetAccrualFromService(orderNum int64) (response models.AccrualSystemResponce, err error) {
 
-	url := fmt.Sprintf("http://%s/api/orders/%s", a.config.AccrualSystemAddress, strconv.FormatInt(orderNum, 10))
+	url := fmt.Sprintf("%s/api/orders/%s", a.config.AccrualSystemAddress, strconv.FormatInt(orderNum, 10))
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
