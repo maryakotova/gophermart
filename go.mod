@@ -3,6 +3,7 @@ module gophermart
 go 1.23.7
 
 require (
+	github.com/go-chi/chi v1.5.5
 	github.com/golang-jwt/jwt/v4 v4.5.1
 	github.com/jackc/pgconn v1.14.3
 	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
@@ -12,7 +13,6 @@ require (
 )
 
 require (
-	github.com/go-chi/chi v1.5.5 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect

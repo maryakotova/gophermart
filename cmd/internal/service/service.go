@@ -35,11 +35,7 @@ func NewService(storage *storage.Storage, logger *zap.Logger, accrual *accrualse
 }
 
 func (s *Service) CreateUser(ctx context.Context, login string, password string) (userID int, err error) {
-	exists, err := s.checkUserExists(ctx, login)
-	if err != nil {
-		s.logger.Error(err.Error())
-		return
-	}
+	exists := s.checkUserExists(ctx, login)
 
 	if exists {
 		err = customerrors.ErrUsernameTaken
@@ -207,10 +203,10 @@ func (s *Service) GetWithdraws(ctx context.Context, userID int) (withdrawals []m
 	return withdrawals, nil
 }
 
-func (s *Service) checkUserExists(ctx context.Context, login string) (exists bool, err error) {
+func (s *Service) checkUserExists(ctx context.Context, login string) (exists bool) {
 
-	userID, err := s.storage.GetUserID(ctx, login)
-	return userID != -1, err
+	userID, _ := s.storage.GetUserID(ctx, login)
+	return userID != -1
 
 }
 

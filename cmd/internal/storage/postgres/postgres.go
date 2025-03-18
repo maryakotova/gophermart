@@ -125,7 +125,7 @@ func (ps *PostgresStorage) GetUserID(ctx context.Context, userName string) (user
 		WHERE user_name = $1;
 	`
 	ps.mtx.Lock()
-	err = ps.db.QueryRowContext(ctx, query, userName).Scan(userID)
+	err = ps.db.QueryRowContext(ctx, query, userName).Scan(&userID)
 	ps.mtx.Unlock()
 	if err != nil {
 		return -1, err
@@ -147,7 +147,7 @@ func (ps *PostgresStorage) CreateUser(ctx context.Context, login string, hashedP
 	`
 
 	ps.mtx.Lock()
-	err = ps.db.QueryRowContext(ctx, query, login, hashedPassword).Scan(userID)
+	err = ps.db.QueryRowContext(ctx, query, login, hashedPassword).Scan(&userID)
 	ps.mtx.Unlock()
 	if err != nil {
 		return -1, err
@@ -164,7 +164,7 @@ func (ps *PostgresStorage) GetUserAuthData(ctx context.Context, login string) (u
 		WHERE user_name = $1;
 	`
 	ps.mtx.Lock()
-	err = ps.db.QueryRowContext(ctx, query, login).Scan(userID, hashedPassword)
+	err = ps.db.QueryRowContext(ctx, query, login).Scan(&userID, &hashedPassword)
 	ps.mtx.Unlock()
 	if err != nil {
 		return -1, "", err
@@ -182,7 +182,7 @@ func (ps *PostgresStorage) GetUserByOrderNum(ctx context.Context, orderNumber in
 	`
 
 	ps.mtx.Lock()
-	err = ps.db.QueryRowContext(ctx, query, orderNumber).Scan(userID)
+	err = ps.db.QueryRowContext(ctx, query, orderNumber).Scan(&userID)
 	ps.mtx.Unlock()
 	if err != nil {
 		return -1, err
@@ -296,7 +296,7 @@ func (ps *PostgresStorage) GetCurrentBalance(ctx context.Context, userID int) (b
 		WHERE user_name = $1;
 	`
 	ps.mtx.Lock()
-	err = ps.db.QueryRowContext(ctx, query, userID).Scan(balance)
+	err = ps.db.QueryRowContext(ctx, query, userID).Scan(&balance)
 	ps.mtx.Unlock()
 	if err != nil {
 		return 0, err
@@ -314,7 +314,7 @@ func (ps *PostgresStorage) GetWithdrawalSum(ctx context.Context, userID int) (wi
 	`
 
 	ps.mtx.Lock()
-	err = ps.db.QueryRowContext(ctx, query, userID).Scan(withdrawalSum)
+	err = ps.db.QueryRowContext(ctx, query, userID).Scan(&withdrawalSum)
 	ps.mtx.Unlock()
 	if err != nil {
 		return 0, err
