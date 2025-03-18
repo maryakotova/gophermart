@@ -159,6 +159,9 @@ func (handler *Handler) LoadOrder(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	info := fmt.Sprintf("заказ %s успешно загружен", string(orderNum))
+	handler.logger.Info(info)
+
 	res.Header().Set("Content-Type", "text/plain")
 	res.WriteHeader(http.StatusAccepted)
 
@@ -251,12 +254,17 @@ func (handler *Handler) Withdraw(res http.ResponseWriter, req *http.Request) {
 	err = handler.service.WithdrawalRequest(req.Context(), userID, orderNumber, request.Sum)
 	if err != nil {
 		if errors.Is(err, customerrors.ErrLowBalance) {
+			err = fmt.Errorf("ошибка при попытке списания для заказа %v суммы %v: %w", orderNumber, request.Sum, err)
 			http.Error(res, err.Error(), http.StatusPaymentRequired)
 		} else {
+			err = fmt.Errorf("ошибка при попытке списания для заказа %v суммы %v: %w", orderNumber, request.Sum, err)
 			http.Error(res, err.Error(), http.StatusInternalServerError)
 		}
 		return
 	}
+
+	info := fmt.Sprintf("успешное списано %v баллов для заказа %v", orderNumber, request.Sum)
+	handler.logger.Info(info)
 
 	res.Header().Set("Content-Type", "text/plain")
 	res.WriteHeader(http.StatusOK)

@@ -88,5 +88,6 @@ func ReadAuthCookie(r *http.Request) (userID int, err error) {
 	}
 
 	return userID, nil
+
 	// return 2, nil
 }
