@@ -14,7 +14,7 @@ type Claims struct {
 	UserID int
 }
 
-const TokenExp = time.Hour * 3
+const TokenExp = time.Hour * 24
 const SecretKey = "SecretKeyForGophermart"
 
 func SetAuthCookie(w http.ResponseWriter, userID int) error {
