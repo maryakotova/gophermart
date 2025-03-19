@@ -28,14 +28,14 @@ func NewAccrualSystem(cfg *config.Config, logger *zap.Logger) (*AccrualService, 
 	}, nil
 }
 
-func (a *AccrualService) GetAccrualFromService(orderNum int64) (response models.AccrualSystemResponce, err error) {
+func (a *AccrualService) GetAccrualFromService(orderNum int64) (response models.AccrualSystemResponce, retryAfter string, err error) {
 
 	url := fmt.Sprintf("%s/api/orders/%s", a.config.AccrualSystemAddress, strconv.FormatInt(orderNum, 10))
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		a.logger.Error(err.Error())
-		return response, err
+		return response, retryAfter, err
 	}
 
 	client := &http.Client{}
@@ -43,7 +43,7 @@ func (a *AccrualService) GetAccrualFromService(orderNum int64) (response models.
 	resp, err := client.Do(req)
 	if err != nil {
 		a.logger.Error(err.Error())
-		return response, err
+		return response, retryAfter, err
 	}
 	defer resp.Body.Close()
 
@@ -54,7 +54,7 @@ func (a *AccrualService) GetAccrualFromService(orderNum int64) (response models.
 		if err != nil {
 			err = fmt.Errorf("ошибка при десериализации JSON: %w", err)
 			a.logger.Error(err.Error())
-			return response, err
+			return response, retryAfter, err
 		}
 
 	case http.StatusNoContent:
@@ -62,6 +62,7 @@ func (a *AccrualService) GetAccrualFromService(orderNum int64) (response models.
 
 	case http.StatusTooManyRequests:
 		response = models.AccrualSystemResponce{Order: strconv.FormatInt(orderNum, 10), Status: constants.New}
+		retryAfter = resp.Header.Get("Retry-After")
 
 	case http.StatusInternalServerError:
 		err = fmt.Errorf("ошибка при обращении к системе расчёта начислений баллов лояльности")
@@ -74,9 +75,5 @@ func (a *AccrualService) GetAccrualFromService(orderNum int64) (response models.
 		return
 	}
 
-	// if response.Status != constants.Invalid && response.Status != constants.Processed && response.Status != constants.NotRelevant {
-	// 	//добавить в поток на обработку воркерами
-	// }
-
-	return response, err
+	return response, retryAfter, err
 }

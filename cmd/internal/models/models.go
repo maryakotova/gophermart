@@ -48,3 +48,8 @@ type AccrualSystemResponce struct {
 	Status  string  `json:"status"`            // Статус заказа
 	Accrual float64 `json:"accrual,omitempty"` // Начисленные баллы
 }
+
+type OrderQueue struct {
+	OrderNum int64
+	Status   string
+}

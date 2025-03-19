@@ -5,8 +5,10 @@ import (
 	"gophermart/cmd/internal/config"
 	"gophermart/cmd/internal/handlers"
 	"gophermart/cmd/internal/logger"
+	"gophermart/cmd/internal/models"
 	"gophermart/cmd/internal/service"
 	"gophermart/cmd/internal/storage"
+	"gophermart/cmd/internal/workerpool"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -33,9 +35,16 @@ func main() {
 		panic(err)
 	}
 
-	service := service.NewService(&storage, log, accrual)
+	orderQueue := make(chan models.OrderQueue, config.RateLimit)
+
+	service := service.NewService(&storage, log, accrual, orderQueue)
 
 	handler := handlers.NewHandler(config, log, service)
+
+	workerpool := workerpool.NewWorkerPool(orderQueue, service, accrual, log)
+	for w := range config.RateLimit {
+		go workerpool.Worker(w)
+	}
 
 	router := chi.NewRouter()
 	router.Use()

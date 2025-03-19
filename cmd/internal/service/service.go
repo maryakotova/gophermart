@@ -21,16 +21,18 @@ import (
 // }
 
 type Service struct {
-	storage storage.Storage
-	logger  *zap.Logger
-	accrual *accrualservice.AccrualService
+	storage    storage.Storage
+	logger     *zap.Logger
+	accrual    *accrualservice.AccrualService
+	orderQueue chan models.OrderQueue
 }
 
-func NewService(storage *storage.Storage, logger *zap.Logger, accrual *accrualservice.AccrualService) *Service {
+func NewService(storage *storage.Storage, logger *zap.Logger, accrual *accrualservice.AccrualService, orderQueue chan models.OrderQueue) *Service {
 	return &Service{
-		storage: *storage,
-		logger:  logger,
-		accrual: accrual,
+		storage:    *storage,
+		logger:     logger,
+		accrual:    accrual,
+		orderQueue: orderQueue,
 	}
 }
 
@@ -83,10 +85,16 @@ func (s *Service) LoadOrderNumber(ctx context.Context, orderNumber int64, userID
 		return err
 	}
 
-	accrualResponce, err := s.accrual.GetAccrualFromService(orderNumber)
+	accrualResponce, _, err := s.accrual.GetAccrualFromService(orderNumber)
 	if err != nil {
 		s.logger.Error(err.Error())
 		return err
+	}
+
+	if accrualResponce.Status != constants.Invalid &&
+		accrualResponce.Status != constants.Processed &&
+		accrualResponce.Status != constants.NotRelevant {
+		s.orderQueue <- models.OrderQueue{OrderNum: orderNumber, Status: accrualResponce.Status}
 	}
 
 	err = s.storage.InsertOrder(ctx, userID, accrualResponce)
@@ -224,5 +232,14 @@ func (s *Service) checkOrderLoaded(ctx context.Context, orderNumber int64, userI
 		return err
 	}
 
+	return nil
+}
+
+func (s *Service) UpdateOrder(ctx context.Context, accrualResponce models.AccrualSystemResponce) error {
+	err := s.storage.UpdateOrder(ctx, accrualResponce)
+	if err != nil {
+		s.logger.Error(err.Error())
+		return err
+	}
 	return nil
 }

@@ -24,6 +24,7 @@ type Storage interface {
 	GetUserAuthData(ctx context.Context, login string) (userID int, hashedPassword string, err error)
 	GetUserByOrderNum(ctx context.Context, orderNumber int64) (userID int, err error)
 	InsertOrder(ctx context.Context, userID int, accrualResponce models.AccrualSystemResponce) error
+	UpdateOrder(ctx context.Context, accrualResponce models.AccrualSystemResponce) error
 	GetOrdersForUser(ctx context.Context, userID int) (orders []models.OrderList, err error)
 	UpdateBalance(ctx context.Context, userID int, points float64) error
 	GetCurrentBalance(ctx context.Context, userID int) (balance float64, err error)

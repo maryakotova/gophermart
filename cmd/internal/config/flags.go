@@ -17,7 +17,7 @@ func ParseFlags() *Flags {
 
 	flag.StringVar(&flags.RunAddress, "a", "localhost:8081", "адрес и порт запуска сервиса")
 	flag.StringVar(&flags.DatabaseURI, "d", "host=localhost user=gophermart password=test dbname=gophermart sslmode=disable", "адрес подключения к базе данных")
-	flag.StringVar(&flags.AccrualSystemAddress, "r", "localhost:8080", "адрес системы расчёта начислений")
+	flag.StringVar(&flags.AccrualSystemAddress, "r", "http://localhost:8080", "адрес системы расчёта начислений")
 
 	if envRunAddress := os.Getenv("RUN_ADDRESS"); envRunAddress != "" {
 		flags.RunAddress = envRunAddress

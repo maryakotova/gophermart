@@ -381,7 +381,7 @@ func (ps *PostgresStorage) GetWithdrawalsForUser(ctx context.Context, userID int
 
 	for rows.Next() {
 		var withdrawal models.Withdrawals
-		err := rows.Scan(&withdrawal.OrderNumber, &withdrawal.ProcessedAt, &withdrawal.Sum)
+		err := rows.Scan(&withdrawal.OrderNumber, &withdrawal.Sum, &withdrawal.ProcessedAt)
 		if err != nil {
 			err = fmt.Errorf("ошибка при считывании строки: %w", err)
 			return nil, err
