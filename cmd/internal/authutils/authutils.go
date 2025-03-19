@@ -44,7 +44,10 @@ func buildJWTString(userID int, expiresAt time.Time) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
+			Issuer:    "Gophermart",
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			Subject:   fmt.Sprintf("%d", userID),
 		},
 		UserID: userID,
 	})
@@ -66,7 +69,7 @@ func getUserID(tokenString string) int {
 
 	claims := &Claims{}
 
-	token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (any, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			slog.Error(fmt.Sprintf("unexpected signing method: %v", t.Header["alg"]))
 			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
