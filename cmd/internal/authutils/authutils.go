@@ -45,8 +45,8 @@ func buildJWTString(userID int, expiresAt time.Time) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "Gophermart",
-			ExpiresAt: expiresAt.Unix(),
-			IssuedAt:  time.Now().Unix(),
+			// ExpiresAt: expiresAt.Unix(),
+			//IssuedAt:  time.Now().Unix(),
 			Subject:   fmt.Sprintf("%d", userID),
 		},
 		UserID: userID,
