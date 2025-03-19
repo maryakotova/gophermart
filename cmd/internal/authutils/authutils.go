@@ -40,12 +40,18 @@ func SetAuthCookie(w http.ResponseWriter, userID int) error {
 
 func buildJWTString(userID int, expiresAt time.Time) (string, error) {
 
+	slog.Info(fmt.Sprintf("данные для создания токена: %v, %v", userID, expiresAt))
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
 		},
 		UserID: userID,
 	})
+
+	if token == nil {
+		slog.Info("объект token не создан")
+	}
 
 	tokenString, err := token.SignedString([]byte(SecretKey))
 	if err != nil {
