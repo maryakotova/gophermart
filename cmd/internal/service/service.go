@@ -124,7 +124,7 @@ func (s *Service) GetOrders(ctx context.Context, userID int) (orders []models.Or
 
 	for _, order := range bdOrders {
 		if order.Status == constants.NotRelevant {
-			order.Status = ""
+			continue
 		}
 
 		orders = append(orders, models.OrderListResponce{
