@@ -58,7 +58,7 @@ func (a *AccrualService) GetAccrualFromService(orderNum int64) (response models.
 		}
 
 	case http.StatusNoContent:
-		response = models.AccrualSystemResponce{Order: strconv.FormatInt(orderNum, 10), Status: constants.New} //Status: constants.NotRelevant}
+		response = models.AccrualSystemResponce{Order: strconv.FormatInt(orderNum, 10), Status: constants.New}
 
 	case http.StatusTooManyRequests:
 		response = models.AccrualSystemResponce{Order: strconv.FormatInt(orderNum, 10), Status: constants.New}

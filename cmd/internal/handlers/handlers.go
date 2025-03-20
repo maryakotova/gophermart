@@ -125,7 +125,6 @@ func (handler *Handler) Login(res http.ResponseWriter, req *http.Request) {
 }
 
 func (handler *Handler) LoadOrder(res http.ResponseWriter, req *http.Request) {
-	res.Header().Set("Content-Type", "text/plain")
 
 	userID, err := authutils.ReadAuthCookie(req)
 	if err != nil {
@@ -133,6 +132,8 @@ func (handler *Handler) LoadOrder(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, err.Error(), http.StatusUnauthorized)
 		return
 	}
+
+	res.Header().Set("Content-Type", "text/plain")
 
 	orderNum, err := io.ReadAll(req.Body)
 	if err != nil {
@@ -164,13 +165,11 @@ func (handler *Handler) LoadOrder(res http.ResponseWriter, req *http.Request) {
 	info := fmt.Sprintf("заказ %s успешно загружен", string(orderNum))
 	handler.logger.Info(info)
 
-	res.Header().Set("Content-Type", "text/plain")
 	res.WriteHeader(http.StatusAccepted)
 
 }
 
 func (handler *Handler) GetOrderList(res http.ResponseWriter, req *http.Request) {
-	res.Header().Set("Content-Type", "application/json")
 
 	userID, err := authutils.ReadAuthCookie(req)
 	if err != nil {
@@ -190,6 +189,8 @@ func (handler *Handler) GetOrderList(res http.ResponseWriter, req *http.Request)
 		return
 	}
 
+	res.Header().Set("Content-Type", "application/json")
+
 	enc := json.NewEncoder(res)
 	if err := enc.Encode(orders); err != nil {
 		err = fmt.Errorf("ошибка при заполнении ответа: %w", err)
@@ -198,14 +199,11 @@ func (handler *Handler) GetOrderList(res http.ResponseWriter, req *http.Request)
 		return
 	}
 
-	res.Header().Set("Content-Type", "application/json")
 	res.WriteHeader(http.StatusOK)
 
 }
 
 func (handler *Handler) GetBalance(res http.ResponseWriter, req *http.Request) {
-
-	res.Header().Set("Content-Type", "application/json")
 
 	userID, err := authutils.ReadAuthCookie(req)
 	if err != nil {
@@ -220,6 +218,8 @@ func (handler *Handler) GetBalance(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	res.Header().Set("Content-Type", "application/json")
+
 	enc := json.NewEncoder(res)
 	if err := enc.Encode(balance); err != nil {
 		err = fmt.Errorf("ошибка при заполнении ответа: %w", err)
@@ -228,14 +228,11 @@ func (handler *Handler) GetBalance(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	res.Header().Set("Content-Type", "application/json")
 	res.WriteHeader(http.StatusOK)
 
 }
 
 func (handler *Handler) Withdraw(res http.ResponseWriter, req *http.Request) {
-
-	res.Header().Set("Content-Type", "text/plain")
 
 	userID, err := authutils.ReadAuthCookie(req)
 	if err != nil {
@@ -243,6 +240,8 @@ func (handler *Handler) Withdraw(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, err.Error(), http.StatusUnauthorized)
 		return
 	}
+
+	res.Header().Set("Content-Type", "text/plain")
 
 	var request models.WithdrawRequest
 	dec := json.NewDecoder(req.Body)
@@ -274,13 +273,10 @@ func (handler *Handler) Withdraw(res http.ResponseWriter, req *http.Request) {
 	info := fmt.Sprintf("успешное списано %v баллов для заказа %v", orderNumber, request.Sum)
 	handler.logger.Info(info)
 
-	res.Header().Set("Content-Type", "text/plain")
 	res.WriteHeader(http.StatusOK)
 }
 
 func (handler *Handler) GetWithdraws(res http.ResponseWriter, req *http.Request) {
-
-	res.Header().Set("Content-Type", "application/json")
 
 	userID, err := authutils.ReadAuthCookie(req)
 	if err != nil {
@@ -300,6 +296,8 @@ func (handler *Handler) GetWithdraws(res http.ResponseWriter, req *http.Request)
 		return
 	}
 
+	res.Header().Set("Content-Type", "application/json")
+
 	enc := json.NewEncoder(res)
 	if err := enc.Encode(withdraws); err != nil {
 		err = fmt.Errorf("ошибка при заполнении ответа: %w", err)
@@ -308,7 +306,6 @@ func (handler *Handler) GetWithdraws(res http.ResponseWriter, req *http.Request)
 		return
 	}
 
-	res.Header().Set("Content-Type", "application/json")
 	res.WriteHeader(http.StatusOK)
 
 }

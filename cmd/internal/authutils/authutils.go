@@ -19,8 +19,6 @@ const SecretKey = "SecretKeyForGophermart"
 
 func SetAuthCookie(w http.ResponseWriter, userID int) error {
 
-	// w.Header().Set("Authorization", strconv.Itoa(userID))
-
 	expiresAt := time.Now().Add(TokenExp)
 	tokenString, err := buildJWTString(userID, expiresAt)
 	if err != nil {
@@ -35,14 +33,10 @@ func SetAuthCookie(w http.ResponseWriter, userID int) error {
 		HttpOnly: true,
 	})
 
-	slog.Info(fmt.Sprintf("Токен сгенерирован: %s", tokenString))
-
 	return nil
 }
 
 func buildJWTString(userID int, expiresAt time.Time) (string, error) {
-
-	slog.Info(fmt.Sprintf("данные для создания токена: %v, %v", userID, expiresAt))
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -54,16 +48,11 @@ func buildJWTString(userID int, expiresAt time.Time) (string, error) {
 		UserID: userID,
 	})
 
-	if token == nil {
-		slog.Info("объект token не создан")
-	}
-
 	tokenString, err := token.SignedString([]byte(SecretKey))
 	if err != nil {
 		slog.Error(fmt.Sprintf("ошибка при подписании токеном: %s", err))
 		return "", err
 	}
-	slog.Info(fmt.Sprintf("token string: %s", tokenString))
 
 	return tokenString, nil
 }
@@ -74,7 +63,6 @@ func getUserID(tokenString string) int {
 
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (any, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			slog.Error(fmt.Sprintf("unexpected signing method: %v", t.Header["alg"]))
 			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 		}
 
@@ -87,7 +75,6 @@ func getUserID(tokenString string) int {
 	}
 
 	if !token.Valid {
-		slog.Error("токен не вальдный")
 		return -1
 	}
 
@@ -96,19 +83,10 @@ func getUserID(tokenString string) int {
 
 func ReadAuthCookie(r *http.Request) (userID int, err error) {
 
-	// userIDstring := r.Header.Get("Authorization")
-
-	// slog.Error(fmt.Sprintf("UserID in request: %s", userIDstring))
-
-	// userID, err = strconv.Atoi(userIDstring)
-
 	cookie, err := r.Cookie("auth_token")
 	if err != nil {
-		slog.Error(fmt.Sprintf("ошибка чтении токена из request: %s", err))
 		return -1, err
 	}
-
-	slog.Info(fmt.Sprintf("значение токена в request: %s", cookie.Value))
 
 	userID = getUserID(cookie.Value)
 
@@ -118,5 +96,4 @@ func ReadAuthCookie(r *http.Request) (userID int, err error) {
 
 	return userID, err
 
-	// return 2, nil
 }
