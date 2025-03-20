@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -45,8 +46,8 @@ func buildJWTString(userID int, expiresAt time.Time) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "Gophermart",
-			// ExpiresAt: expiresAt.Unix(),
-			//IssuedAt:  time.Now().Unix(),
+			ExpiresAt: jwt.NewNumericDate(expiresAt),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			Subject:   fmt.Sprintf("%d", userID),
 		},
 		UserID: userID,
@@ -61,6 +62,11 @@ func buildJWTString(userID int, expiresAt time.Time) (string, error) {
 		slog.Error(fmt.Sprintf("ошибка при подписании токеном: %s", err))
 		return "", err
 	}
+	slog.Info(fmt.Sprintf("token string: %s", tokenString))
+
+	tokenString = strconv.Itoa(userID)
+
+	slog.Info(fmt.Sprintf("token string: %s", tokenString))
 
 	return tokenString, nil
 }
@@ -101,10 +107,15 @@ func ReadAuthCookie(r *http.Request) (userID int, err error) {
 
 	slog.Info(fmt.Sprintf("значение токена в request: %s", cookie.Value))
 
-	userID = getUserID(cookie.Value)
+	userID, _ = strconv.Atoi(cookie.Value)
 
-	if userID == -1 {
-		return userID, err
+	if userID == 0 {
+
+		userID = getUserID(cookie.Value)
+
+		if userID == -1 {
+			return userID, err
+		}
 	}
 
 	return userID, nil
