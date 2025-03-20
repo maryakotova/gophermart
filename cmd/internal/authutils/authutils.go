@@ -2,6 +2,7 @@ package authutils
 
 import (
 	"fmt"
+	"gophermart/cmd/internal/constants"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -28,10 +29,10 @@ func SetAuthCookie(w http.ResponseWriter, userID int) error {
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:     "auth_token",
-		Value:    tokenString,
-		Expires:  expiresAt,
-		HttpOnly: true,
+		Name:  constants.AuthToken,
+		Value: tokenString,
+		// Expires: expiresAt,
+		//HttpOnly: true,
 	})
 
 	slog.Info(fmt.Sprintf("Токен сгенерирован: %s", tokenString))
@@ -99,7 +100,7 @@ func getUserID(tokenString string) int {
 
 func ReadAuthCookie(r *http.Request) (userID int, err error) {
 
-	cookie, err := r.Cookie("auth_token")
+	cookie, err := r.Cookie(constants.AuthToken)
 	if err != nil {
 		slog.Error(fmt.Sprintf("ошибка чтении токена из request: %s", err))
 		return -1, err
