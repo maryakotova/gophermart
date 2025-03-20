@@ -168,6 +168,7 @@ func (handler *Handler) LoadOrder(res http.ResponseWriter, req *http.Request) {
 }
 
 func (handler *Handler) GetOrderList(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("Content-Type", "application/json")
 
 	userID, err := authutils.ReadAuthCookie(req)
 	if err != nil {
