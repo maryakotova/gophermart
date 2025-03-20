@@ -1,6 +1,8 @@
 package authutils
 
 import (
+	"fmt"
+	"log/slog"
 	"net/http"
 	"strconv"
 	"time"
@@ -96,6 +98,8 @@ func SetAuthCookie(w http.ResponseWriter, userID int) error {
 func ReadAuthCookie(r *http.Request) (userID int, err error) {
 
 	userIDstring := r.Header.Get("Authorization")
+
+	slog.Error(fmt.Sprintf("UserID in request: %s", userIDstring))
 
 	userID, err = strconv.Atoi(userIDstring)
 
