@@ -123,6 +123,10 @@ func (s *Service) GetOrders(ctx context.Context, userID int) (orders []models.Or
 	}
 
 	for _, order := range bdOrders {
+		if order.Status == constants.NotRelevant {
+			order.Status = ""
+		}
+
 		orders = append(orders, models.OrderListResponce{
 			OrderNumber: order.OrderNumber,
 			Status:      order.Status,
