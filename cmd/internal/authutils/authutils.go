@@ -1,9 +1,6 @@
 package authutils
 
 import (
-	"fmt"
-	"gophermart/cmd/internal/constants"
-	"log/slog"
 	"net/http"
 	"strconv"
 	"time"
@@ -21,105 +18,102 @@ const SecretKey = "SecretKeyForGophermart"
 
 func SetAuthCookie(w http.ResponseWriter, userID int) error {
 
-	expiresAt := time.Now().Add(TokenExp)
-	tokenString, err := buildJWTString(userID, expiresAt)
-	if err != nil {
-		slog.Error(fmt.Sprintf("ошибка при генерации токена: %s", err))
-		return err
-	}
+	w.Header().Set("Authorization", strconv.Itoa(userID))
 
-	http.SetCookie(w, &http.Cookie{
-		Name:  constants.AuthToken,
-		Value: tokenString,
-		// Expires: expiresAt,
-		//HttpOnly: true,
-	})
+	// expiresAt := time.Now().Add(TokenExp)
+	// tokenString, err := buildJWTString(userID, expiresAt)
+	// if err != nil {
+	// 	slog.Error(fmt.Sprintf("ошибка при генерации токена: %s", err))
+	// 	return err
+	// }
 
-	slog.Info(fmt.Sprintf("Токен сгенерирован: %s", tokenString))
+	// http.SetCookie(w, &http.Cookie{
+	// 	Name:     "auth_token",
+	// 	Value:    tokenString,
+	// 	Expires:  expiresAt,
+	// 	HttpOnly: true,
+	// })
+
+	// slog.Info(fmt.Sprintf("Токен сгенерирован: %s", tokenString))
 
 	return nil
 }
 
-func buildJWTString(userID int, expiresAt time.Time) (string, error) {
+// func buildJWTString(userID int, expiresAt time.Time) (string, error) {
 
-	slog.Info(fmt.Sprintf("данные для создания токена: %v, %v", userID, expiresAt))
+// 	slog.Info(fmt.Sprintf("данные для создания токена: %v, %v", userID, expiresAt))
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
-		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    "Gophermart",
-			ExpiresAt: jwt.NewNumericDate(expiresAt),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			Subject:   fmt.Sprintf("%d", userID),
-		},
-		UserID: userID,
-	})
+// 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
+// 		RegisteredClaims: jwt.RegisteredClaims{
+// 			Issuer:    "Gophermart",
+// 			ExpiresAt: jwt.NewNumericDate(expiresAt),
+// 			IssuedAt:  jwt.NewNumericDate(time.Now()),
+// 			Subject:   fmt.Sprintf("%d", userID),
+// 		},
+// 		UserID: userID,
+// 	})
 
-	if token == nil {
-		slog.Info("объект token не создан")
-	}
+// 	if token == nil {
+// 		slog.Info("объект token не создан")
+// 	}
 
-	tokenString, err := token.SignedString([]byte(SecretKey))
-	if err != nil {
-		slog.Error(fmt.Sprintf("ошибка при подписании токеном: %s", err))
-		return "", err
-	}
-	slog.Info(fmt.Sprintf("token string: %s", tokenString))
+// 	tokenString, err := token.SignedString([]byte(SecretKey))
+// 	if err != nil {
+// 		slog.Error(fmt.Sprintf("ошибка при подписании токеном: %s", err))
+// 		return "", err
+// 	}
+// 	slog.Info(fmt.Sprintf("token string: %s", tokenString))
 
-	tokenString = strconv.Itoa(userID)
+// 	return tokenString, nil
+// }
 
-	slog.Info(fmt.Sprintf("token string: %s", tokenString))
+// func getUserID(tokenString string) int {
 
-	return tokenString, nil
-}
+// 	claims := &Claims{}
 
-func getUserID(tokenString string) int {
+// 	token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (any, error) {
+// 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+// 			slog.Error(fmt.Sprintf("unexpected signing method: %v", t.Header["alg"]))
+// 			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
+// 		}
 
-	claims := &Claims{}
+// 		return []byte(SecretKey), nil
+// 	})
 
-	token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (any, error) {
-		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			slog.Error(fmt.Sprintf("unexpected signing method: %v", t.Header["alg"]))
-			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
-		}
+// 	if err != nil {
+// 		slog.Error(fmt.Sprintf("ошибка при чтении токена: %s", err))
+// 		return -1
+// 	}
 
-		return []byte(SecretKey), nil
-	})
+// 	if !token.Valid {
+// 		slog.Error("токен не вальдный")
+// 		return -1
+// 	}
 
-	if err != nil {
-		slog.Error(fmt.Sprintf("ошибка при чтении токена: %s", err))
-		return -1
-	}
-
-	if !token.Valid {
-		slog.Error("токен не вальдный")
-		return -1
-	}
-
-	return claims.UserID
-}
+// 	return claims.UserID
+// }
 
 func ReadAuthCookie(r *http.Request) (userID int, err error) {
 
-	cookie, err := r.Cookie(constants.AuthToken)
-	if err != nil {
-		slog.Error(fmt.Sprintf("ошибка чтении токена из request: %s", err))
-		return -1, err
-	}
+	userIDstring := r.Header.Get("Authorization")
 
-	slog.Info(fmt.Sprintf("значение токена в request: %s", cookie.Value))
+	userID, err = strconv.Atoi(userIDstring)
 
-	userID, _ = strconv.Atoi(cookie.Value)
+	// cookie, err := r.Cookie("auth_token")
+	// if err != nil {
+	// 	slog.Error(fmt.Sprintf("ошибка чтении токена из request: %s", err))
+	// 	return -1, err
+	// }
 
-	if userID == 0 {
+	// slog.Info(fmt.Sprintf("значение токена в request: %s", cookie.Value))
 
-		userID = getUserID(cookie.Value)
+	// userID = getUserID(cookie.Value)
 
-		if userID == -1 {
-			return userID, err
-		}
-	}
+	// if userID == -1 {
+	// 	return userID, err
+	// }
 
-	return userID, nil
+	return userID, err
 
 	// return 2, nil
 }
