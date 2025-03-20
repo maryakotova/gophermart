@@ -125,6 +125,8 @@ func (handler *Handler) Login(res http.ResponseWriter, req *http.Request) {
 }
 
 func (handler *Handler) LoadOrder(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("Content-Type", "text/plain")
+
 	userID, err := authutils.ReadAuthCookie(req)
 	if err != nil {
 		handler.logger.Error(err.Error())
@@ -203,6 +205,8 @@ func (handler *Handler) GetOrderList(res http.ResponseWriter, req *http.Request)
 
 func (handler *Handler) GetBalance(res http.ResponseWriter, req *http.Request) {
 
+	res.Header().Set("Content-Type", "application/json")
+
 	userID, err := authutils.ReadAuthCookie(req)
 	if err != nil {
 		handler.logger.Error(err.Error())
@@ -230,6 +234,9 @@ func (handler *Handler) GetBalance(res http.ResponseWriter, req *http.Request) {
 }
 
 func (handler *Handler) Withdraw(res http.ResponseWriter, req *http.Request) {
+
+	res.Header().Set("Content-Type", "text/plain")
+
 	userID, err := authutils.ReadAuthCookie(req)
 	if err != nil {
 		handler.logger.Error(err.Error())
@@ -272,6 +279,8 @@ func (handler *Handler) Withdraw(res http.ResponseWriter, req *http.Request) {
 }
 
 func (handler *Handler) GetWithdraws(res http.ResponseWriter, req *http.Request) {
+
+	res.Header().Set("Content-Type", "application/json")
 
 	userID, err := authutils.ReadAuthCookie(req)
 	if err != nil {
