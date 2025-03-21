@@ -1,8 +1,9 @@
 package main
 
-// Привет! Не реализован механизм сжатия, доделаю
+// Привет! Реализовала механизм сжатия, как в metrics. Может быть нужно по-другому?
+// И не сделала retry для ошибок при подключении к БД, тоже доделаю, но хотела бы сначала обсудить
 // Есть вопрос по правильному обновлению нескольких таблиц БД. Если по логике приложения должны быть обновлены несколько таблиц
-// (например, order и balance) Нужно обновление в одну функцию с пакет postgres добавить и использовать транзакцию?
+// (например, order и balance) Нужно ли обновлять их через транзакцию?
 // Ты обещал прислать пример использования транзакций, то так и не прислал, жду
 // При возможности прошу прислать не только замечания, но и варианты, что можно улучшить и с чем еще потренироваться
 // Заранее спасибо :)
@@ -12,11 +13,13 @@ import (
 	"gophermart/cmd/internal/config"
 	"gophermart/cmd/internal/handlers"
 	"gophermart/cmd/internal/logger"
+	"gophermart/cmd/internal/middleware"
 	"gophermart/cmd/internal/models"
 	"gophermart/cmd/internal/service"
 	"gophermart/cmd/internal/storage"
 	"gophermart/cmd/internal/workerpool"
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/chi"
 )
@@ -69,4 +72,33 @@ func main() {
 		panic(err)
 	}
 
+}
+
+func gzipMiddleware(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ow := w
+
+		supportsGzip := strings.Contains(r.Header.Get("Accept-Encoding"), "gzip")
+		supportsGzipJSON := strings.Contains(r.Header.Get("Accept"), "application/json")
+		supportsGzipHTML := strings.Contains(r.Header.Get("Accept"), "text/html")
+		if supportsGzip && (supportsGzipJSON || supportsGzipHTML) {
+			cw := middleware.NewCompressWriter(w)
+			ow = cw
+			defer cw.Close()
+			ow.Header().Set("Content-Encoding", "gzip")
+		}
+
+		sendsGzip := strings.Contains(r.Header.Get("Content-Encoding"), "gzip")
+		if sendsGzip {
+			cr, err := middleware.NewCompressReader(r.Body)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			r.Body = cr
+			defer cr.Close()
+		}
+
+		h.ServeHTTP(ow, r)
+	}
 }

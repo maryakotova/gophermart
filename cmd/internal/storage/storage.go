@@ -9,15 +9,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// import (
-// 	"context"
-
-// 	"github.com/maryakotova/gophermart/cmd/internal/config"
-// 	"github.com/maryakotova/gophermart/cmd/internal/models"
-// 	"github.com/maryakotova/gophermart/cmd/internal/storage/postgres"
-// 	"go.uber.org/zap"
-// )
-
 type Storage interface {
 	GetUserID(ctx context.Context, userName string) (userID int, err error)
 	CreateUser(ctx context.Context, login string, hashedPassword string) (userID int, err error)
